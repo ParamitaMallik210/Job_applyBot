@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src import config, filters, state  # noqa: E402
 from src.ats import load_resume_text, score_job  # noqa: E402
-from src.notify import send_digest, send_message  # noqa: E402
+from src.notify import send_digest  # noqa: E402
 from src.sources import fetch_linkedin, fetch_naukri  # noqa: E402
 
 
@@ -99,8 +99,9 @@ def run() -> int:
         log.info("Match (%d%%): %s @ %s", ats.score, job["title"], job["company"])
 
     matches.sort(key=lambda m: m[1].score, reverse=True)
-    sent = send_digest(matches)
-    log.info("Sent %d notifications", sent)
+    channel = cfg.get("notify", {}).get("channel", "whatsapp")
+    sent = send_digest(matches, channel=channel)
+    log.info("Sent %d notifications via %s", sent, channel)
 
     state.save(seen)
     return 0

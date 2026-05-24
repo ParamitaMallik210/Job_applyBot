@@ -1,6 +1,6 @@
 profile:
   experience_years: 2
-  min_ctc_lpa: 15
+  min_ctc_lpa: 14
   locations:
     - Bengaluru
     - Bangalore
@@ -15,6 +15,11 @@ title_whitelist:
   - SDE-1
   - SDE 1
   - SDE I
+  - SDE-2
+  - SDE 2
+  - SDE II
+  - SDE1
+  - SDE2
   - Software Developer
   - Associate Software Engineer
   - Junior Software Engineer
@@ -108,12 +113,13 @@ ats:
     - nunit
     - xunit
     - blockchain
-  llm_suggestions: true
+  llm_suggestions: false  # No Claude API key needed; keyword score still runs
   llm_model: claude-sonnet-4-6
 
 notify:
-  digest_mode: true  # Batches all matches into one Telegram message per run
-  min_score_to_notify: 40  # Skip notifications below this ATS match %
+  channel: whatsapp   # whatsapp | telegram | both
+  digest_mode: true
+  min_score_to_notify: 40
 
 resume:
   path: resume/resume.pdf
