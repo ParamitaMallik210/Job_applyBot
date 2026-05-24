@@ -1,5 +1,6 @@
 name: Job Bot
 
+# Polls Naukri + LinkedIn, scores against resume, DMs Telegram.
 on:
   # 9:00 AM IST = 03:30 UTC, 7:00 PM IST = 13:30 UTC
   schedule:
