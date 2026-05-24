@@ -117,7 +117,7 @@ ats:
   llm_model: claude-sonnet-4-6
 
 notify:
-  channel: whatsapp   # whatsapp | telegram | both
+  channel: telegram   # whatsapp | telegram | both
   digest_mode: true
   min_score_to_notify: 40
 
