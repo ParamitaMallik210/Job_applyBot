@@ -12,7 +12,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src import config, filters, state  # noqa: E402
 from src.ats import load_resume_text, score_job  # noqa: E402
 from src.notify import send_digest  # noqa: E402
-from src.sources import fetch_linkedin, fetch_naukri  # noqa: E402
+from src.sources import (  # noqa: E402
+    fetch_foundit,
+    fetch_hirist,
+    fetch_indeed,
+    fetch_instahyre,
+    fetch_linkedin,
+    fetch_naukri,
+)
 
 
 logging.basicConfig(
@@ -50,13 +57,65 @@ def _gather_jobs(cfg: dict) -> list[dict]:
         try:
             jobs.extend(
                 fetch_linkedin(
-                    keywords=keywords[:5],  # keep LinkedIn calls modest to dodge blocks
+                    keywords=keywords[:5],
                     locations=locations,
                     pages=sources_cfg["linkedin"].get("pages_per_query", 2),
                 )
             )
         except Exception as exc:
             log.warning("LinkedIn source crashed (expected sometimes): %s", exc)
+
+    if sources_cfg.get("indeed", {}).get("enabled", True):
+        log.info("Fetching Indeed (best-effort)...")
+        try:
+            jobs.extend(
+                fetch_indeed(
+                    keywords=keywords[:5],
+                    locations=locations,
+                    pages=sources_cfg["indeed"].get("pages_per_query", 2),
+                )
+            )
+        except Exception as exc:
+            log.warning("Indeed source crashed: %s", exc)
+
+    if sources_cfg.get("foundit", {}).get("enabled", True):
+        log.info("Fetching Foundit (best-effort)...")
+        try:
+            jobs.extend(
+                fetch_foundit(
+                    keywords=keywords[:5],
+                    locations=locations,
+                    pages=sources_cfg["foundit"].get("pages_per_query", 2),
+                )
+            )
+        except Exception as exc:
+            log.warning("Foundit source crashed: %s", exc)
+
+    if sources_cfg.get("instahyre", {}).get("enabled", True):
+        log.info("Fetching Instahyre (best-effort)...")
+        try:
+            jobs.extend(
+                fetch_instahyre(
+                    keywords=keywords[:5],
+                    locations=locations,
+                    pages=sources_cfg["instahyre"].get("pages_per_query", 2),
+                )
+            )
+        except Exception as exc:
+            log.warning("Instahyre source crashed: %s", exc)
+
+    if sources_cfg.get("hirist", {}).get("enabled", True):
+        log.info("Fetching Hirist (best-effort)...")
+        try:
+            jobs.extend(
+                fetch_hirist(
+                    keywords=keywords[:5],
+                    locations=locations,
+                    pages=sources_cfg["hirist"].get("pages_per_query", 1),
+                )
+            )
+        except Exception as exc:
+            log.warning("Hirist source crashed: %s", exc)
 
     return jobs
 

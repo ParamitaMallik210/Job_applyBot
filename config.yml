@@ -74,10 +74,22 @@ jd_match:
 sources:
   naukri:
     enabled: true
-    pages_per_query: 6   # deeper paging for ~10-day backfill
+    pages_per_query: 6
   linkedin:
     enabled: true
     pages_per_query: 4
+  indeed:
+    enabled: true
+    pages_per_query: 2
+  foundit:
+    enabled: true
+    pages_per_query: 2
+  instahyre:
+    enabled: true
+    pages_per_query: 2
+  hirist:
+    enabled: true
+    pages_per_query: 1
 
 ats:
   # Tuned from Paramita's resume (C#/.NET/Azure stack at WiseTech Global +
