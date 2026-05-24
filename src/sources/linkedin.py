@@ -100,7 +100,7 @@ def fetch(
                     "keywords": keyword,
                     "location": location,
                     "f_E": _EXPERIENCE_FILTER,
-                    "f_TPR": "r604800",  # last 7 days
+                    "f_TPR": "r1209600",  # last 14 days (covers the 10-day backfill)
                     "start": page * 25,
                 }
                 try:
