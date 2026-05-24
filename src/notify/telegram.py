@@ -35,6 +35,31 @@ def _short_role(title: str) -> str:
     return cleaned[:55] + "…" if len(cleaned) > 55 else cleaned
 
 
+def _track_url(job: dict, ats) -> str:
+    """Build a GitHub issue-creation URL that pre-fills the application tracker."""
+    repo = os.environ.get("GITHUB_REPOSITORY") or "ParamitaMallik210/Job_applyBot"
+    raw_company = job.get("company") or "Unknown"
+    raw_role = _short_role(job.get("title") or "")
+    title = f"Applied: {raw_company} - {raw_role}"
+    body_lines = [
+        f"**Company:** {raw_company}",
+        f"**Role:** {raw_role}",
+        f"**ATS Match:** {ats.score}%",
+        f"**Salary:** {job.get('salary') or 'Not disclosed'}",
+        f"**Location:** {job.get('location') or '-'}",
+        f"**Source:** {job.get('source', '')}",
+        f"**Job URL:** {job['url']}",
+        "",
+        "_Update the label to `interviewing`, `rejected`, `offered`, or `withdrawn` as your status changes._",
+    ]
+    from urllib.parse import quote
+    body = "\n".join(body_lines)
+    return (
+        f"https://github.com/{repo}/issues/new"
+        f"?title={quote(title)}&body={quote(body)}&labels=applied"
+    )
+
+
 def _format_card(job: dict, ats) -> tuple[str, dict]:
     """Build the compact message text + inline-button keyboard for one job."""
     company = _escape(job.get("company") or "Unknown")
@@ -61,7 +86,10 @@ def _format_card(job: dict, ats) -> tuple[str, dict]:
             [
                 {"text": "🚀 Apply", "url": job["url"]},
                 {"text": "📋 Details", "url": job["url"]},
-            ]
+            ],
+            [
+                {"text": "📌 Track Applied", "url": _track_url(job, ats)},
+            ],
         ]
     }
     return text, keyboard

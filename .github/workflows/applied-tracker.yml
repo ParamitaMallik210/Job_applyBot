@@ -1,0 +1,66 @@
+name: Applied Tracker
+
+# Fires when you submit a new "Applied:" issue from a Telegram Track button,
+# or when you change a label on an existing application issue. Posts a
+# running-total update to your dedicated Telegram channel.
+on:
+  issues:
+    types: [opened, labeled, unlabeled, closed, reopened]
+
+permissions:
+  issues: read
+  contents: read
+
+jobs:
+  notify:
+    if: contains(github.event.issue.labels.*.name, 'applied')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Count and notify
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_APPLIED_CHAT_ID: ${{ secrets.TELEGRAM_APPLIED_CHAT_ID }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event.action }}
+          TITLE: ${{ github.event.issue.title }}
+          NUMBER: ${{ github.event.issue.number }}
+          STATE: ${{ github.event.issue.state }}
+        run: |
+          set -euo pipefail
+
+          # Count issues by label (using GitHub search). Bash makes the counts.
+          count() {
+            gh issue list --repo "$REPO" --state all --label "$1" --limit 1000 --json number \
+              | jq 'length'
+          }
+
+          total=$(count applied)
+          interviewing=$(count interviewing || echo 0)
+          rejected=$(count rejected || echo 0)
+          offered=$(count offered || echo 0)
+          withdrawn=$(count withdrawn || echo 0)
+          # "Active" = applied label, not closed, not in any later-stage label
+          active=$(gh issue list --repo "$REPO" --state open --label applied --limit 1000 --json labels \
+            | jq '[.[] | select(([.labels[].name] | inside(["interviewing","rejected","offered","withdrawn"]) | not))] | length')
+
+          # Compose the Telegram message
+          if [[ "$EVENT" == "opened" ]]; then
+            header="✅ New application logged"
+          elif [[ "$EVENT" == "closed" ]]; then
+            header="📁 Application closed: #$NUMBER"
+          else
+            header="🔄 Status updated: #$NUMBER"
+          fi
+
+          msg=$(printf "%s\n*%s*\n\n📊 *Total applications:* %s\n🟢 Active: %s  ·  💬 Interviewing: %s\n🏆 Offered: %s  ·  ❌ Rejected: %s  ·  🚪 Withdrawn: %s" \
+            "$header" "$TITLE" "$total" "$active" "$interviewing" "$offered" "$rejected" "$withdrawn")
+
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_APPLIED_CHAT_ID}" \
+            --data-urlencode "text=${msg}" \
+            --data-urlencode "parse_mode=Markdown" \
+            --data "disable_web_page_preview=true" > /tmp/tg.out
+
+          cat /tmp/tg.out
