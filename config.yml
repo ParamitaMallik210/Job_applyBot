@@ -75,26 +75,39 @@ sources:
     pages_per_query: 2
 
 ats:
-  # Edit these to reflect your actual skills. The keyword score rewards JDs that
-  # overlap with this list; missing-from-JD skills are reported back to you.
+  # Tuned from Paramita's resume (C#/.NET/Azure stack at WiseTech Global +
+  # blockchain experience). Edit freely as your resume evolves.
   my_skills:
+    - c#
+    - .net
+    - asp.net
+    - sql
+    - t-sql
+    - javascript
     - java
-    - python
-    - spring boot
-    - rest api
-    - microservices
-    - mysql
-    - postgresql
-    - mongodb
-    - aws
+    - c++
+    - solidity
+    - node.js
+    - express.js
+    - react
+    - react.js
+    - web3.js
+    - azure
     - docker
     - kubernetes
+    - ci/cd
     - git
-    - linux
-    - sql
-    - kafka
-    - redis
-    - junit
+    - rest api
+    - microservices
+    - oop
+    - solid principles
+    - dependency injection
+    - tdd
+    - agile
+    - distributed systems
+    - nunit
+    - xunit
+    - blockchain
   llm_suggestions: true
   llm_model: claude-sonnet-4-6
 
